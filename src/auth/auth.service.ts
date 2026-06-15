@@ -1,4 +1,5 @@
-import { BadRequestException, ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
+import "dotenv/config"
+import {  ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
 import bcrypt from "bcrypt"
 import { JwtService } from '@nestjs/jwt';
 import { SignupDto } from './dto/Signup.dto';
@@ -14,26 +15,21 @@ export class AuthService {
 
     async signup(singupDto: SignupDto){
         const {username, email, password} = singupDto;
-
-        // TODO: Add users find options
-        const usersExists = {};
+        const usersExists = await this.usersService.findByEmail(email)
         if(usersExists){
             throw new ConflictException("Email already registered")
         }
 
-        const hashedPassword = await bcrypt.hash(password, process.env.SALT_ROUNDS!)
+        const hashedPassword = await bcrypt.hash(password, Number(process.env.SALT_ROUNDS!))
 
         const newUser = {
-            id: 1,
             username,
             email,
             password: hashedPassword
         }
+        const created = await this.usersService.create(newUser);
 
-        // TODO: Add to database
-
-        const payload = { sub: newUser.id, email: newUser.username}
-
+        const payload = { sub: created.id, email: created.email}
         return {
             message: "User successfully registered",
             access_token: await this.jwtService.signAsync(payload)
@@ -43,19 +39,19 @@ export class AuthService {
     async login(loginDto: LoginDto){
         const {email, password} = loginDto;
 
-        // TODO: Find user
-        const user = {id: 1, username: "Marc",email: "something@gmail.com", password: "pass"}
+        const user = await this.usersService.findByEmail(email)
         if(!user)
             throw new UnauthorizedException("Invalid credentials")
-        const isMatch = await bcrypt.compare(user.password, password);
+        const isMatch = await bcrypt.compare(password, user.password);
+
         if(!isMatch)
             throw new UnauthorizedException("Invalid credentials")
 
-        const payload = {sub: user.id, username: user.username}
+        const payload = {sub: user.id, email: user.email}
 
         return{
             message: "Login succesfull",
-            access_token: this.jwtService.signAsync(payload)
+            access_token: await this.jwtService.signAsync(payload)
         }
     }
 }

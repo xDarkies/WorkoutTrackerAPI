@@ -1,6 +1,8 @@
-import { Controller, Post, ValidationPipe, UsePipes, Body } from '@nestjs/common';
+import { Controller, Post, ValidationPipe, UsePipes, Body, Get, UseGuards, Request } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignupDto } from './dto/Signup.dto';
+import { LoginDto } from './dto/Login.dto';
+import { JwtAuthGuard } from './jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -14,7 +16,13 @@ export class AuthController {
 
     @Post('login')
     @UsePipes(ValidationPipe)
-    login(){
+    login(@Body() loginDto: LoginDto){
+        return this.authService.login(loginDto)
+    }
 
+    @Get('me')
+    @UseGuards(JwtAuthGuard)
+    auth(@Request() req){
+        return req.user;
     }
 }
