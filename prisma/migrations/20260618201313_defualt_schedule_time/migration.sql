@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "workouts" ALTER COLUMN "scheduledAt" SET DEFAULT CURRENT_TIMESTAMP;

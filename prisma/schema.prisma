@@ -18,22 +18,36 @@ model User {
 }
 
 model Workout {
-  id         String      @id @default(uuid()) @db.Uuid
-  excercises Exercise[]
-  user       User       @relation(fields: [userId], references: [id])
-  userId     String     @db.Uuid
+  id               String             @id @default(uuid()) @db.Uuid
+  workoutExercises WorkoutExercise[]
+  user             User               @relation(fields: [userId], references: [id])
+  userId           String             @db.Uuid
+  scheduledAt      DateTime           @default(now())
 
   @@map("workouts")
 }
 
 model Exercise {
-  id          String   @id @default(uuid()) @db.Uuid
-  name        String   @unique
-  description String
-  category    Category
-  workout     Workout[]
+  id               String             @id @default(uuid()) @db.Uuid
+  name             String             @unique
+  description      String
+  category         Category
+  workoutExercises WorkoutExercise[]
 
   @@map("exercises")
+}
+
+model WorkoutExercise {
+  id         String   @id @default(uuid()) @db.Uuid
+  workout    Workout  @relation(fields: [workoutId], references: [id])
+  workoutId  String   @db.Uuid
+  exercise   Exercise @relation(fields: [exerciseId], references: [id])
+  exerciseId String   @db.Uuid
+  sets       Int
+  reps       Int
+  weights    Int
+
+  @@map("workout_exercises")
 }
 
 enum Category {
