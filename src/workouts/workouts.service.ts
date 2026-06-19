@@ -37,16 +37,18 @@ export class WorkoutsService {
 
 
     async update(reqUserId: string,updateWorkoutDto: UpdateWorkoutDto,id: string){
-        const {userId, exercises, scheduledAt} = updateWorkoutDto; 
-
-        if(reqUserId !== userId)
-            throw new ForbiddenException()
+        const {exercises, scheduledAt} = updateWorkoutDto; 
 
         const workout = await this.prisma.workout.findUnique({
             where: {id: id},
         })
         if(!workout)
             throw new NotFoundException()
+
+        
+        if(reqUserId !== workout.userId)
+            throw new ForbiddenException()
+
         
         const updated = await this.prisma.workout.update({
             where: { id },

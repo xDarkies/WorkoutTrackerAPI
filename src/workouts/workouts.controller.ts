@@ -8,9 +8,10 @@ import {
     Request, 
     Put, 
     Patch,
-    ForbiddenException,
     Delete,
-    Query
+    Query,
+    UsePipes,
+    ValidationPipe
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { CreateWorkoutDto } from './dto/createWorkout.dto';
@@ -27,24 +28,28 @@ export class WorkoutsController {
 
     @Post()
     @UseGuards(JwtAuthGuard)
+    @UsePipes(ValidationPipe)
     create(@Body() createWorkoutDto: CreateWorkoutDto, @Request() req){
         return this.workoutService.create(req.userId,createWorkoutDto)
     }
 
     @Put(':id')
     @UseGuards(JwtAuthGuard)
+    @UsePipes(ValidationPipe)
     update(@Param('id') id: string,@Body() updateWorkoutDto: UpdateWorkoutDto, @Request() req){
         return this.workoutService.update(req.userId,updateWorkoutDto,id)
     }
 
     @Delete(':id')
     @UseGuards(JwtAuthGuard)
+    @UsePipes(ValidationPipe)
     delete(@Param('id') id: string, @Request() req){
         this.workoutService.delete(req.userId,id);
     }
 
     @Patch('schedule/:id')
     @UseGuards(JwtAuthGuard)
+    @UsePipes(ValidationPipe)
     updateSchedule(@Param('id') id: string, @Body() updateScheduleDto: UpdateScheduleDto,@Request() req){
         return this.workoutService.updateSchedule(req.userId,updateScheduleDto,id);
     }
@@ -57,6 +62,7 @@ export class WorkoutsController {
 
     @Get('')
     @UseGuards(JwtAuthGuard)
+    @UsePipes(ValidationPipe)
     listWorkouts(@Body() listWorkoutsDto: ListWorkoutsDto, @Request() req,@Query('status') status?: WorkoutStatus){
         return this.workoutService.listWorkouts(req.userId, listWorkoutsDto, status);
     }

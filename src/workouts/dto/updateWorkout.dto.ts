@@ -1,3 +1,5 @@
+import { IsDate } from "class-validator";
+
 type Exercise = {
     id: string;
     sets?: number;
@@ -6,7 +8,8 @@ type Exercise = {
 }
 
 export class UpdateWorkoutDto{
-    userId: string;
     exercises: Exercise[];
+    
+    @IsDate()
     scheduledAt: Date;
 }
