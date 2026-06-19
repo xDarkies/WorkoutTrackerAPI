@@ -23,6 +23,7 @@ model Workout {
   user             User               @relation(fields: [userId], references: [id])
   userId           String             @db.Uuid
   scheduledAt      DateTime           @default(now())
+  status           WorkoutStatus      @default(SCHEDULED)
 
   @@map("workouts")
 }
@@ -39,14 +40,15 @@ model Exercise {
 
 model WorkoutExercise {
   id         String   @id @default(uuid()) @db.Uuid
-  workout    Workout  @relation(fields: [workoutId], references: [id])
+  workout    Workout  @relation(fields: [workoutId], references: [id], onDelete: Cascade)
   workoutId  String   @db.Uuid
-  exercise   Exercise @relation(fields: [exerciseId], references: [id])
+  exercise   Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
   exerciseId String   @db.Uuid
   sets       Int
   reps       Int
   weights    Int
 
+  @@unique([workoutId,exerciseId])
   @@map("workout_exercises")
 }
 
@@ -54,4 +56,11 @@ enum Category {
   Cardio
   Strength
   Flexibility
+}
+
+enum WorkoutStatus {
+  SCHEDULED
+  COMPLETED
+  MISSED
+  CANCELLED
 }
