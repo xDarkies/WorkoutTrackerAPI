@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateWorkoutDto } from './dto/createWorkout.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateWorkoutDto } from './dto/updateWorkout.dto';
@@ -7,8 +7,11 @@ import { UpdateWorkoutDto } from './dto/updateWorkout.dto';
 export class WorkoutsService {
     constructor(private prisma: PrismaService){}
 
-    async create(createWorkoutDto: CreateWorkoutDto){
+    async create(reqUserId: string,createWorkoutDto: CreateWorkoutDto){
         const {userId, exercises, scheduledAt} = createWorkoutDto; 
+
+        if(reqUserId !== userId)
+            throw new ForbiddenException()
 
         const workout = await this.prisma.workout.create({
             data: {
@@ -30,14 +33,17 @@ export class WorkoutsService {
     }
 
 
-    async update(updateWorkoutDto: UpdateWorkoutDto,id: string){
+    async update(reqUserId: string,updateWorkoutDto: UpdateWorkoutDto,id: string){
+        const {userId, exercises, scheduledAt} = updateWorkoutDto; 
+
+        if(reqUserId !== userId)
+            throw new ForbiddenException()
+
         const workout = await this.prisma.workout.findUnique({
             where: {id: id},
         })
         if(!workout)
             throw new NotFoundException()
-
-        const {userId, exercises, scheduledAt} = updateWorkoutDto; 
         
         const updated = await this.prisma.workout.update({
             where: { id },
@@ -58,5 +64,18 @@ export class WorkoutsService {
         });
 
         return updated;
+    }
+
+    async delete(id: string, reqUserId: string){
+        const workout = await this.prisma.workout.findUnique({where: {id}})
+        
+        if(!workout)
+            throw new NotFoundException()
+
+        if(workout.userId !== reqUserId)
+            throw new ForbiddenException()
+
+        await this.prisma.workout.delete({where: {id}})
+
     }
 }
