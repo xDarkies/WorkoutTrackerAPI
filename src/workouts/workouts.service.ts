@@ -2,6 +2,7 @@ import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/commo
 import { CreateWorkoutDto } from './dto/createWorkout.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateWorkoutDto } from './dto/updateWorkout.dto';
+import { UpdateScheduleDto } from './dto/updateSchedule.dto';
 
 @Injectable()
 export class WorkoutsService {
@@ -66,7 +67,7 @@ export class WorkoutsService {
         return updated;
     }
 
-    async delete(id: string, reqUserId: string){
+    async delete(reqUserId: string, id: string){
         const workout = await this.prisma.workout.findUnique({where: {id}})
         
         if(!workout)
@@ -77,5 +78,25 @@ export class WorkoutsService {
 
         await this.prisma.workout.delete({where: {id}})
 
+    }
+
+    async updateSchedule(reqUserId: string,updateScheduleDto: UpdateScheduleDto, id: string){
+        const workout = await this.prisma.workout.findUnique({where: {id}})
+
+        if(!workout)
+            throw new NotFoundException()
+
+        if(workout.userId !== reqUserId)
+            throw new ForbiddenException()
+
+        const updated = await this.prisma.workout.update({
+            where: {id},
+            data: {
+                scheduledAt: updateScheduleDto.date
+            },
+            include: {workoutExercises: {include: {exercise: true}}}
+        })
+
+        return updated;
     }
 }
