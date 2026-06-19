@@ -17,7 +17,9 @@ import { CreateWorkoutDto } from './dto/createWorkout.dto';
 import { WorkoutsService } from './workouts.service';
 import { UpdateWorkoutDto } from './dto/updateWorkout.dto';
 import { UpdateScheduleDto } from './dto/updateSchedule.dto';
+import { ListWorkoutsDto } from './dto/listWorkouts.dto';
 import { WorkoutStatus } from '@prisma/client';
+
 
 @Controller('api/workouts')
 export class WorkoutsController {
@@ -51,5 +53,11 @@ export class WorkoutsController {
     @UseGuards(JwtAuthGuard)
     markAs(@Param('id') id: string, @Query('status') status: WorkoutStatus, @Request() req){
         return this.workoutService.markAs(req.userId, status, id);
+    }
+
+    @Get('')
+    @UseGuards(JwtAuthGuard)
+    listWorkouts(@Body() listWorkoutsDto: ListWorkoutsDto, @Request() req,@Query('status') status?: WorkoutStatus){
+        return this.workoutService.listWorkouts(req.userId, listWorkoutsDto, status);
     }
 }

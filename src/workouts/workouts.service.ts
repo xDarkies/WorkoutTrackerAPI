@@ -4,6 +4,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateWorkoutDto } from './dto/updateWorkout.dto';
 import { UpdateScheduleDto } from './dto/updateSchedule.dto';
 import { WorkoutStatus } from '@prisma/client';
+import { ListWorkoutsDto } from './dto/listWorkouts.dto';
 
 @Injectable()
 export class WorkoutsService {
@@ -118,4 +119,23 @@ export class WorkoutsService {
 
         return marked;
     }
+
+    async listWorkouts(reqUserId: string, listWorkoutsDto: ListWorkoutsDto, status?: WorkoutStatus){
+        const workouts = await this.prisma.workout.findMany({
+            where: {
+                userId: reqUserId,
+                scheduleAt: {
+                    lte: listWorkoutsDto.startDate,
+                    gte: listWorkoutsDto.endDate
+                },
+                status: status
+            },
+            include: {workoutExercises: {include: {exercise: true}}},
+            orderBy: {
+                scheduledAt: 'asc'
+            }
+        })
+        return workouts;
+    }
+
 }
