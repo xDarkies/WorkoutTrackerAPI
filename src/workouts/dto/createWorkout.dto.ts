@@ -1,4 +1,4 @@
-import { IsUUID, IsNotEmpty, IsDate } from "class-validator";
+import { IsUUID, IsNotEmpty, IsDateString } from "class-validator";
 
 type Exercise = {
     id: string;
@@ -15,6 +15,6 @@ export class CreateWorkoutDto {
     exercises: Exercise[];
     
     @IsNotEmpty()
-    @IsDate()
+    @IsDateString()
     scheduledAt?: Date;
 }

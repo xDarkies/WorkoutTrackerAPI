@@ -12,7 +12,6 @@ export class WorkoutsService {
 
     async create(reqUserId: string,createWorkoutDto: CreateWorkoutDto){
         const {userId, exercises, scheduledAt} = createWorkoutDto; 
-
         if(reqUserId !== userId)
             throw new ForbiddenException()
 
@@ -53,7 +52,7 @@ export class WorkoutsService {
         const updated = await this.prisma.workout.update({
             where: { id },
             data: {
-                ...(userId ? { user: { connect: { id: userId } } } : {}),
+                ...(workout.userId ? { user: { connect: { id: workout.userId } } } : {}),
                 ...(scheduledAt ? { scheduledAt } : {}),
                 workoutExercises: {
                     deleteMany: {},
@@ -126,9 +125,9 @@ export class WorkoutsService {
         const workouts = await this.prisma.workout.findMany({
             where: {
                 userId: reqUserId,
-                scheduleAt: {
-                    lte: listWorkoutsDto.startDate,
-                    gte: listWorkoutsDto.endDate
+                scheduledAt: {
+                    gte: listWorkoutsDto.startDate,
+                    lte: listWorkoutsDto.endDate
                 },
                 status: status
             },
@@ -138,6 +137,68 @@ export class WorkoutsService {
             }
         })
         return workouts;
+    }
+
+    async report(userId){
+        const endDate = new Date()
+        var date = new Date()
+        date.setDate(date.getDate() - 30)
+        const startDate = date.toISOString()
+
+        const workouts = await this.prisma.workout.groupBy({
+            by: ['status'],
+            _count: {
+                id: true,
+            },
+            where: {
+                scheduledAt: {
+                    gte: startDate,
+                    lte: endDate
+                },
+                userId,
+                status:{
+                    not: WorkoutStatus.SCHEDULED
+                }
+            }
+        })
+
+        const report = [
+            {
+                status: WorkoutStatus.COMPLETED,
+                count: 0,
+                percent: "0%"
+            },
+            {
+                status: WorkoutStatus.MISSED,
+                count: 0,
+                percent: "0%"
+            },
+            {
+                status: WorkoutStatus.CANCELLED,
+                count: 0,
+                percent: "0%"
+            }
+        ]
+        var sum = 0;
+        for(const workout of workouts){
+            sum += workout._count.id;
+        }
+        for(const workout of workouts){
+            if(workout.status == "COMPLETED") {
+                report[0].count = workout._count.id;
+                report[0].percent = ((workout._count.id / sum) * 100)+ "%"
+            }
+            if(workout.status == "MISSED"){
+                report[1].count = workout._count.id;
+                report[1].percent = ((workout._count.id / sum) * 100)+ "%"
+            } 
+            if(workout.status == "CANCELLED") {
+                report[2].count = workout._count.id;
+                report[2].percent = ((workout._count.id / sum) * 100)+ "%"
+            }
+        }
+
+        return report;
     }
 
 }
