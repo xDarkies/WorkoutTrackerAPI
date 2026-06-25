@@ -1,98 +1,173 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# WorkoutTrackerAPI
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A NestJS + Prisma backend API for storing and managing user workout plans, workout exercises, schedules, and status reporting.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## What this project does
 
-## Description
+- Provides authentication with email/password and JWT tokens.
+- Lets users create, update, delete, and schedule workouts.
+- Stores exercises inside workouts and tracks status like `SCHEDULED`, `COMPLETED`, `MISSED`, and `CANCELLED`.
+- Generates a 30-day workout report with counts and percentages of completed, missed, and cancelled workouts.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Tech stack
 
-## Project setup
+- NestJS (Node.js framework)
+- Prisma ORM
+- PostgreSQL database
+- JWT authentication
+- bcrypt password hashing
+- TypeScript
+
+## Installation
+
+1. Clone the repository
 
 ```bash
-$ npm install
+git clone https://github.com/xdarkies/workouttrackerapi
+cd WorkoutTrackerAPI
 ```
 
-## Compile and run the project
+2. Install dependencies
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+npm install
 ```
 
-## Run tests
+3. Set environment variables
+
+Create a `.env` file in the project root with these values:
+
+```env
+DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE"
+JWT_SECRET="your-jwt-secret"
+SALT_ROUNDS=10
+PORT=3000
+```
+
+4. Apply Prisma migrations / generate client
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npx prisma generate
+npx prisma migrate deploy
 ```
 
-## Deployment
+> If you are still developing locally, you can also use `npx prisma db push` after creating the database.
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+## Running the server
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+npm run start:dev
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+The API listens on `http://localhost:3000` by default.
 
-## Resources
+## Available scripts
 
-Check out a few resources that may come in handy when working with NestJS:
+- `npm run start` — start server
+- `npm run start:dev` — start in watch mode
+- `npm run build` — compile TypeScript
+- `npm run lint` — lint project source
+- `npm run test` — run Jest unit tests
+- `npm run test:e2e` — run e2e tests
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+## Environment variables
 
-## Support
+Required values:
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+- `DATABASE_URL` — PostgreSQL connection string
+- `JWT_SECRET` — secret used to sign and verify JWT tokens
+- `SALT_ROUNDS` — bcrypt salt rounds for password hashing
+- `PORT` — optional server port (default `3000`)
 
-## Stay in touch
+## Authentication flow
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+1. Register with `POST /auth/signup`
+2. Log in with `POST /auth/login`
+3. Receive `access_token`
+4. Send `Authorization: Bearer <token>` for protected workout endpoints
 
-## License
+## API endpoints
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+### Auth
+
+- `POST /auth/signup`
+  - Registers a new user.
+  - Body:
+    - `username` string
+    - `email` string
+    - `password` string
+  - Returns a message and `access_token`.
+
+- `POST /auth/login`
+  - Authenticates an existing user.
+  - Body:
+    - `email` string
+    - `password` string
+  - Returns a message and `access_token`.
+
+- `GET /auth/me`
+  - Returns the authenticated user record.
+  - Requires `Authorization: Bearer <token>`.
+
+### Workouts
+
+All workout endpoints require a valid JWT token in `Authorization: Bearer <token>`.
+
+- `POST /api/workouts`
+  - Create a new workout.
+  - Body:
+    - `userId` string (must match the authenticated user id)
+    - `exercises` array of exercise objects:
+      - `id` string (existing exercise id)
+      - `sets` number (optional)
+      - `reps` number (optional)
+      - `weights` number (optional)
+    - `scheduledAt` ISO date string (optional)
+  - Returns the created workout record.
+
+- `PUT /api/workouts/:id`
+  - Update an existing workout by id.
+  - Body:
+    - `exercises` array of exercise objects
+    - `scheduledAt` ISO date string
+  - Replaces workout exercises and updates schedule.
+
+- `DELETE /api/workouts/:id`
+  - Delete a workout by id.
+
+- `PATCH /api/workouts/schedule/:id`
+  - Update a workout schedule date.
+  - Body:
+    - `date` ISO date string
+
+- `PATCH /api/workouts/mark/:id?status=...`
+  - Change workout status.
+  - Query parameter:
+    - `status` = `COMPLETED`, `MISSED`, or `CANCELLED`
+
+- `GET /api/workouts`
+  - List workouts for the authenticated user.
+  - Body:
+    - `startDate` ISO date string
+    - `endDate` ISO date string
+  - Optional query:
+    - `status` = `SCHEDULED`, `COMPLETED`, `MISSED`, `CANCELLED`
+  - Returns workouts in ascending scheduled order.
+
+- `GET /api/workouts/report`
+  - Returns a 30-day status report for the authenticated user.
+  - Response includes counts and percentage breakdown for completed, missed, and cancelled workouts.
+
+## Notes
+
+- The API uses Prisma models for `User`, `Workout`, `Exercise`, and `WorkoutExercise`.
+- Workouts are scoped to the authenticated user; users cannot access or modify other users' workouts.
+- The `userId` provided when creating a workout must match the JWT subject (`sub`) from the token.
+
+## Useful commands
+
+```bash
+npm run format
+npm run lint
+npm run test
+```
